@@ -13,6 +13,12 @@ function getFileName() {
   return name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf('.'));
 }
 
+function pathJoin(parts, sep){
+  var separator = sep || '/';
+  var replace   = new RegExp(separator+'{1,}', 'g');
+  return parts.join(separator).replace(replace, separator);
+}
+
 function filterDataPavlovia(
   rows = {},
   filetype = 'csv',
@@ -76,6 +82,46 @@ function getVersionNumber(num, numberOfVersions) {
   return (num % numberOfVersions) + 1;
 }
 
+function checkvpReward_en() {
+  'use strict';
+  let email = document.getElementById('email').value;
+
+  let voucher = '';
+  if ($('#amazon').is(':checked')) {
+    voucher = 'amazon';
+  } else if ($('#bahn').is(':checked')) {
+    voucher = 'amazon';
+  }
+
+  if (email !== '' && voucher !== '') {
+    jsPsych.data.addProperties({ email: email, voucher: voucher});
+    return true;
+  } else {
+    window.alert('Please answer all questions and click the consent box to continue!');
+    return false;
+  }
+}
+
+function checkvpReward_de() {
+  'use strict';
+  let email = document.getElementById('email').value;
+
+  let voucher = '';
+  if ($('#amazon').is(':checked')) {
+    voucher = 'amazon';
+  } else if ($('#bahn').is(':checked')) {
+    voucher = 'amazon';
+  }
+
+  if (email !== '' && voucher !== '') {
+    jsPsych.data.addProperties({ email: email, voucher: voucher});
+    return true;
+  } else {
+    window.alert('Bitte beantworten Sie alle Fragen!');
+    return false;
+  }
+}
+
 function checkVpInfoForm_en() {
   // get age, gender, handedness and VPs consent
   'use strict';
@@ -97,13 +143,26 @@ function checkVpInfoForm_en() {
     hand = 'right';
   }
 
+  let education = '';
+  if ($('#elementary').is(':checked')) {
+    education = 'elementary';
+  } else if ($('#middle').is(':checked')) {
+    education = 'middle';
+  } else if ($('#high').is(':checked')) {
+    education = 'high';
+  } else if ($('#university').is(':checked')) {
+    education = 'university';
+  } else if ($('#phd').is(':checked')) {
+    education = 'phd';
+  }
+
   let consent = false;
   if ($('#consent_checkbox').is(':checked')) {
     consent = true;
   }
 
-  if (consent && age !== '' && gender !== '' && hand !== '') {
-    jsPsych.data.addProperties({ age: age, gender: gender, handedness: hand });
+  if (consent && age !== '' && gender !== '' && hand !== '' && education !== '') {
+    jsPsych.data.addProperties({ age: age, gender: gender, handedness: hand, education: education });
     return true;
   } else {
     window.alert('Please answer all questions and click the consent box to continue!');
@@ -132,13 +191,26 @@ function checkVpInfoForm_de() {
     hand = 'right';
   }
 
+  let education = '';
+  if ($('#elementary').is(':checked')) {
+    education = 'elementary';
+  } else if ($('#middle').is(':checked')) {
+    education = 'middle';
+  } else if ($('#high').is(':checked')) {
+    education = 'high';
+  } else if ($('#university').is(':checked')) {
+    education = 'university';
+  } else if ($('#phd').is(':checked')) {
+    education = 'phd';
+  }
+
   let consent = false;
   if ($('#consent_checkbox').is(':checked')) {
     consent = true;
   }
 
-  if (consent && age !== '' && gender !== '' && hand !== '') {
-    jsPsych.data.addProperties({ age: age, gender: gender, handedness: hand });
+  if (consent && age !== '' && gender !== '' && hand !== '' && education !== '') {
+    jsPsych.data.addProperties({ age: age, gender: gender, handedness: hand, education: education });
     return true;
   } else {
     window.alert('Bitte beantworten Sie alle Fragen!');
@@ -213,7 +285,7 @@ function codeTrial() {
 function trialFeedbackTxt(feedback_text) {
   'use strict';
   let dat = jsPsych.data.get().last(1).values()[0];
-  return '<h2>' + feedback_text[dat.corrCode - 1] + '</h2>';
+  return '<H1>' + feedback_text[dat.corrCode - 1] + '</H1>';
 }
 
 function blockFeedbackTxt(filter_options) {
@@ -225,18 +297,18 @@ function blockFeedbackTxt(filter_options) {
   }).length;
   dat = jsPsych.data.get().filter({ ...filter_options, blockNum: prms.cBlk, corrCode: 1 });
   let blockFbTxt =
-    '<h2>Block: ' +
+    '<H1>Block: ' +
     prms.cBlk +
     ' of ' +
     prms.nBlks +
-    '</h2><br>' +
-    '<h2>Mean RT: ' +
+    '</H1><br>' +
+    '<H1>Mean RT: ' +
     Math.round(dat.select('rt').mean()) +
-    ' ms </h2>' +
-    '<h2>Error Rate: ' +
+    ' ms </H1>' +
+    '<H1>Error Rate: ' +
     Math.round((nError / nTotal) * 100) +
-    ' %</h2><br>' +
-    '<h2>Press any key to continue the experiment!</h2>';
+    ' %</H1><br>' +
+    '<H2>Press any key to continue the experiment!</H2>';
   prms.cBlk += 1;
   return blockFbTxt;
 }
@@ -250,18 +322,18 @@ function blockFeedbackTxt_de(filter_options) {
   }).length;
   dat = jsPsych.data.get().filter({ ...filter_options, blockNum: prms.cBlk, corrCode: 1 });
   let blockFbTxt =
-    '<h2>Block: ' +
+    '<H1>Block: ' +
     prms.cBlk +
     ' von ' +
     prms.nBlks +
-    '</h2><br>' +
-    '<h2>Mittlere Reaktionszeit: ' +
+    '</H1><br>' +
+    '<H1>Mittlere Reaktionszeit: ' +
     Math.round(dat.select('rt').mean()) +
-    ' ms </h2>' +
-    '<h2>Fehlerrate: ' +
+    ' ms </H1>' +
+    '<H1>Fehlerrate: ' +
     Math.round((nError / nTotal) * 100) +
-    ' %</h2><br>' +
-    '<h2>Drücken Sie eine beliebige Taste um fortzufahren!</h2>';
+    ' %</H1><br>' +
+    '<H2>Drücken Sie eine beliebige Taste um fortzufahren!</H2>';
   prms.cBlk += 1;
   return blockFbTxt;
 }
@@ -275,18 +347,18 @@ function blockFeedbackTxt_de_du(filter_options) {
   }).length;
   dat = jsPsych.data.get().filter({ ...filter_options, blockNum: prms.cBlk, corrCode: 1 });
   let blockFbTxt =
-    '<h2>Block: ' +
+    '<H1>Block: ' +
     prms.cBlk +
     ' von ' +
     prms.nBlks +
-    '</h2><br>' +
-    '<h2>Mittlere Reaktionszeit: ' +
+    '</H1><br>' +
+    '<H1>Mittlere Reaktionszeit: ' +
     Math.round(dat.select('rt').mean()) +
-    ' ms </h2>' +
-    '<h2>Fehlerrate: ' +
+    ' ms </H1>' +
+    '<H1>Fehlerrate: ' +
     Math.round((nError / nTotal) * 100) +
-    ' %</h2><br>' +
-    '<h2>Drücke eine beliebige Taste, um fortzufahren!</h2>';
+    ' %</H1><br>' +
+    '<H2>Drücke eine beliebige Taste, um fortzufahren!</H2>';
   prms.cBlk += 1;
   return blockFbTxt;
 }
@@ -514,7 +586,7 @@ function repeatArray(a, n) {
 ////////////////////////////////////////////////////////////////////////
 const welcome_en = {
   type: 'html-keyboard-response',
-  stimulus: '<h2>Welcome. Press any key to continue.</h2>',
+  stimulus: '<H1>Welcome. Press any key to continue.</H1>',
   response_ends_trial: true,
   on_finish: function () {
     'use strict';
@@ -524,7 +596,7 @@ const welcome_en = {
 
 const welcome_de = {
   type: 'html-keyboard-response',
-  stimulus: '<h2>Willkommen. Drücken Sie eine beliebige Taste, um fortzufahren!</h2>',
+  stimulus: '<h1>Willkommen. Drücken Sie eine beliebige Taste, um fortzufahren!</h1>',
   on_finish: function () {
     'use strict';
     jsPsych.data.addProperties({ date: Date() });
@@ -533,7 +605,7 @@ const welcome_de = {
 
 const welcome_de_du = {
   type: 'html-keyboard-response',
-  stimulus: '<h2>Willkommen bei unserem Experiment. <br><br>Bitte drücke eine beliebige Taste, um fortzufahren!</h2>',
+  stimulus: '<h1>Willkommen. Drücke eine beliebige Taste, um fortzufahren!</h1>',
   on_finish: function () {
     'use strict';
     jsPsych.data.addProperties({ date: Date() });
@@ -542,7 +614,7 @@ const welcome_de_du = {
 
 const welcome_de_du_click = {
   type: 'html-button-response',
-  stimulus: '<h2>Willkommen. Bitte klicke "Continue" um fortzufahren!</h2>',
+  stimulus: '<h1>Willkommen. Bitte klicke "Continue" um fortzufahren!</h1>',
   choices: ['Continue'],
   on_finish: function () {
     'use strict';
@@ -566,7 +638,6 @@ const resize_de = {
   prompt:
     '<p>Klicken Sie und ziehen Sie die untere rechte Ecke bis der Kasten die gleiche Größe wie eine Bankkarte oder Ihr Universitätsausweis hat.</p>',
   pixels_per_unit: 100,
-  button_label: 'Weiter',
 };
 
 const resize_de_du = {
@@ -589,13 +660,6 @@ const fullscreen_on = {
   fullscreen_mode: true,
 };
 
-const fullscreen_on_de = {
-  type: 'fullscreen',
-  fullscreen_mode: true,
-  message: '<p>Das Experiment wechselt in den Vollbildmodus, sobald du die Taste ‚Weiter‘ drückst</p>',
-  button_label: 'Weiter',
-};
-
 const fullscreen_off = {
   type: 'fullscreen',
   fullscreen_mode: false,
@@ -615,6 +679,20 @@ const showMouseCursor = {
   },
 };
 
+const vpReward_en = {
+  type: 'external-html',
+  url: '/Common/vpReward_en.html',
+  cont_btn: 'submit',
+  check_fn: checkvpReward_en,
+};
+
+const vpReward_de = {
+  type: 'external-html',
+  url: '/Common/vpReward_de.html',
+  cont_btn: 'submit',
+  check_fn: checkvpReward_de,
+};
+
 const vpInfoForm_en = {
   type: 'external-html',
   url: '/Common/vpInfoForm_en.html',
@@ -631,20 +709,20 @@ const vpInfoForm_de = {
 
 const debrief_en = {
   type: 'html-keyboard-response',
-  stimulus: '<h2>The experiment is finished.</h2>' + '<h2>Press any key to end the experiment!</h2>',
+  stimulus: '<H1>The experiment is finished.</H1>' + '<H2>Press any key to end the experiment!</H2>',
   response_ends_trial: true,
 };
 
 const debrief_de = {
   type: 'html-keyboard-response',
   stimulus:
-    '<h2>Das Experiment ist beendet.</h2>' + '<h2>Drücken Sie eine beliebige Taste, um das Experiment zu beenden!</h2>',
+    '<h1>Das Experiment ist beendet.</h1>' + '<h2>Drücken Sie eine beliebige Taste, um das Experiment zu beenden!</h2>',
   response_ends_trial: true,
 };
 
 const debrief_de_du = {
   type: 'html-keyboard-response',
   stimulus:
-    '<h2>Das Experiment ist beendet.</h2>' + '<h2>Drücke eine beliebige Taste, um das Experiment zu beenden!</h2>',
+    '<h1>Das Experiment ist beendet.</h1>' + '<h2>Drücke eine beliebige Taste, um das Experiment zu beenden!</h2>',
   response_ends_trial: true,
 };
