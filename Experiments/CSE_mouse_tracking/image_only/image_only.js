@@ -70,7 +70,7 @@ function drawFeedback() {
 function codeTrial() {
   'use strict';
   let dat = jsPsych.data.get().last(1).values()[0];
-  let corrCode = dat.resp_corr !== dat.end_loc ? 1 : 0;
+  let corrCode = dat.correct_side !== dat.end_loc ? 1 : 0;
   jsPsych.data.addDataToLastTrial({ date: Date(), corrCode: corrCode, blockNum: prms.cBlk, trialNum: prms.cTrl });
   prms.cTrl += 1;
   if (dat.key_press === 27) {
@@ -83,13 +83,19 @@ function codeTrial() {
 ////////////////////////////////////////////////////////////////////////
 // TODO: Change instructions
 const task_instructions = {
-  type: 'html-keyboard-response',
-  stimulus:
-    "<H1 style='text-align: left;'>BITTE NUR TEILNEHMEN, FALLS EINE</H1>" +
-    "<H1 style='text-align: left;'>COMPUTER-MAUS ZUR VERFÜGUNG STEHT!</H1><br>" +
-    "<H2 style='text-align: left;'>Liebe/r Teilnehmer/in</H2><br>" +
-    "<H2 style='text-align: left;'>...<br><br>" +
-    "<h3 style='text-align: center;'>Drücke eine beliebige Taste, um fortzufahren!</h3>",
+  Typ: 'html-Tastatur-Antwort',
+  Stimulus:
+    "<H1 style = 'text-align: left;'> BITTE NUR TEILNEHMEN, WENN EINS </H1>" +
+    "<H1 style = 'text-align: left;'> COMPUTER-MAUS IST VERFÜGBAR! </H1> <br>" +
+    "<H2 style = 'text-align: left;'> Lieber Teilnehmer </H2> <br>" +
+    "<H3 style = 'text-align: left;'> im Experiment sehen Sie in jedem Durchlauf 3 Quadrate. Am Anfang </H3>" +
+    "<H3 style = 'text-align: left;'> der Passage bewegen Sie die Maus in das Quadrat am unteren Bildschirmrand </H3>" +
+    "<H3 style = 'text-align: left;'> und klicke in das Quadrat. Dann erscheint ein Wort: </H3> <br>" +
+    "<H3 style = 'text-align: left;'> Bitte bewegen Sie dann die Maus auf die </H3>" +
+    "<H3 style = 'text-align: left;'> das Quadrat auf dem Bild, das Ihrer Meinung nach mit dem präsentierten Wort </H3>" +
+    "<H3 style = 'text-align: left;'> in Zusammenhang steht, </H3>" +
+    "<H3 style = 'text-align: left;'> um so schnell und richtig wie möglich zu reagieren.
+    "<h3 style = 'text-align: center;'> Drücken Sie eine beliebige Taste, um fortzufahren! </h3>",
   post_trial_gap: prms.waitDur,
 };
 
@@ -99,31 +105,25 @@ const task_instructions = {
 ////////////////////////////////////////////////////////////////////////
 var stimuli = [];
 for (const s of items) {
-	stimulus = {
-    is_control: s['is_control'], 
-    probe: s['probe'],
-		probe_type: s['probe_type'], 
-	}
-	// select randomly one of the congruent/incongruent target for a certain prime
-	if (Math.round(Math.random()) == 0){
-		target = s['congruent'];
-	} else {
-		target = s['incongruent'];
-	}
-  // position the selected target randomly left or right
+	stimulus = {}
+  // randomly  position targets left or right
   if (Math.round(Math.random()) == 0){
-    stimulus.right = target;
-		stimulus.left = s['control'];
-    stimulus.target_side = 'right';
-    // save position of the correct answer
-    stimulus.resp_corr = stimulus.is_control === true ? 'left': 'right';
+    stimulus.right = s['target_rel_img'];
+		stimulus.left = s['target_unrel_img'];
+    stimulus.correct_side = 'right';
 	} else {
-    stimulus.right = s['control'];
-		stimulus.left = target;
-    stimulus.target_side = 'left';
-    // save position of the correct answer
-    stimulus.resp_corr = stimulus.is_control === true ? 'right': 'left';
+    stimulus.right = s['target_unrel_img'];
+		stimulus.left = s['target_rel_img'];
+    stimulus.correct_side = 'left';
 	}
+  // randomly select probe type 
+  if (Math.round(Math.random()) == 0){
+    stimulus.probe = s['probe_amb']
+    stimulus.probe_type = 'ambiguous'
+  } else {
+    stimulus.probe = s['probe_unamb']
+    stimulus.probe_type = 'unambiguous'
+  }
 	stimuli.push(stimulus);
 };
 
@@ -155,13 +155,11 @@ const trial_stimulus = {
   scale_factor: null,
   data: {
     stim_type: 'cse_mouse_tracking',
-    is_control: jsPsych.timelineVariable('is_control'),
     probe: jsPsych.timelineVariable('probe'),
     probe_type: jsPsych.timelineVariable('probe_type'),
     right: jsPsych.timelineVariable('right'),
     left: jsPsych.timelineVariable('left'),
-    target_side: jsPsych.timelineVariable('target_side'),
-    resp_corr: jsPsych.timelineVariable('resp_corr'),
+    correct_side: jsPsych.timelineVariable('correct_side'),
   },
   on_start: function (trial) {
     trial.left_image = trial.data.left;
@@ -223,7 +221,7 @@ const alphaNum = {
         Wenn Sie Versuchspersonenstunden benötigen, kopieren Sie den folgenden
         zufällig generierten Code und senden Sie diesen zusammen mit Ihrer
         Matrikelnummer per Email mit dem Betreff 'Versuchpersonenstunde'
-        an:<br><br>sprachstudien@psycho.uni-tuebingen.de<br> Code: ` +
+        an:<br><br>nicoletta.simi@uni-tuebingen.de<br> Code: ` +
       randomString +
       `<br><br>Drücken Sie die Leertaste, um fortzufahren!`,
     fontsize: 28,
