@@ -83,19 +83,13 @@ function codeTrial() {
 ////////////////////////////////////////////////////////////////////////
 // TODO: Change instructions
 const task_instructions = {
-  Typ: 'html-Tastatur-Antwort',
-  Stimulus:
-    "<H1 style = 'text-align: left;'> BITTE NUR TEILNEHMEN, WENN EINS </H1>" +
-    "<H1 style = 'text-align: left;'> COMPUTER-MAUS IST VERFÜGBAR! </H1> <br>" +
-    "<H2 style = 'text-align: left;'> Lieber Teilnehmer </H2> <br>" +
-    "<H3 style = 'text-align: left;'> im Experiment sehen Sie in jedem Durchlauf 3 Quadrate. Am Anfang </H3>" +
-    "<H3 style = 'text-align: left;'> der Passage bewegen Sie die Maus in das Quadrat am unteren Bildschirmrand </H3>" +
-    "<H3 style = 'text-align: left;'> und klicke in das Quadrat. Dann erscheint ein Wort: </H3> <br>" +
-    "<H3 style = 'text-align: left;'> Bitte bewegen Sie dann die Maus auf die </H3>" +
-    "<H3 style = 'text-align: left;'> das Quadrat auf dem Bild, das Ihrer Meinung nach mit dem präsentierten Wort </H3>" +
-    "<H3 style = 'text-align: left;'> in Zusammenhang steht, </H3>" +
-    "<H3 style = 'text-align: left;'> um so schnell und richtig wie möglich zu reagieren.
-    "<h3 style = 'text-align: center;'> Drücken Sie eine beliebige Taste, um fortzufahren! </h3>",
+  type: 'html-keyboard-response',
+  stimulus:
+    "<H1 style='text-align: left;'>BITTE NUR TEILNEHMEN, FALLS EINE</H1>" +
+    "<H1 style='text-align: left;'>COMPUTER-MAUS ZUR VERFÜGUNG STEHT!</H1><br>" +
+    "<H2 style='text-align: left;'>Liebe/r Teilnehmer/in</H2><br>" +
+    "<H2 style='text-align: left;'>...<br><br>" +
+    "<h3 style='text-align: center;'>Drücke eine beliebige Taste, um fortzufahren!</h3>",
   post_trial_gap: prms.waitDur,
 };
 
@@ -221,7 +215,7 @@ const alphaNum = {
         Wenn Sie Versuchspersonenstunden benötigen, kopieren Sie den folgenden
         zufällig generierten Code und senden Sie diesen zusammen mit Ihrer
         Matrikelnummer per Email mit dem Betreff 'Versuchpersonenstunde'
-        an:<br><br>nicoletta.simi@uni-tuebingen.de<br> Code: ` +
+        an:<br><br>sprachstudien@psycho.uni-tuebingen.de<br> Code: ` +
       randomString +
       `<br><br>Drücken Sie die Leertaste, um fortzufahren!`,
     fontsize: 28,

@@ -1,9 +1,8 @@
-// Negation task using the phrases "now left"/"not left" and mouse tracking responses.
 
 ////////////////////////////////////////////////////////////////////////
 //                         Canvas Properties                          //
 ////////////////////////////////////////////////////////////////////////
-const canvas_colour = 'rgba(200, 200, 200, 1)';
+const canvas_colour = 'rgba(255, 255, 255, 1)';
 const canvas_size = [1280, 720];
 const canvas_border = '5px solid black';
 
@@ -24,27 +23,27 @@ const expName = getFileName();
 const dirName = getDirName();
 const vpNum = genVpNum();
 const pcInfo = getComputerInfo();
-const nFiles = getNumberOfFiles('/Common/num_files.php', dirName + 'data/');
 
 ////////////////////////////////////////////////////////////////////////
 //                           Exp Parameters                           //
 ////////////////////////////////////////////////////////////////////////
 const prms = {
-  nTrlsP: 16, // number of trials in first block (practice)
-  nTrlsE: 48, // number of trials in subsequent blocks
-  nBlks: 9,
+  nTrlsP: 8, // number of trials in first block (practice)
+  nTrlsE: 16, // number of trials in subsequent blocks
+  nBlks: 2,
   fbDur: [500, 1000], // feedback duration for correct and incorrect trials, respectively
   waitDur: 1000,
   iti: 500,
-  fixDur: 500,
   fixPos: [canvas_size[0] / 2, canvas_size[1] * 0.75], // x,y position of stimulus
+  fixDur: 500,
   stimPos: [canvas_size[0] / 2, canvas_size[1] * 0.75], // x,y position of stimulus
   startBox: [canvas_size[0] / 2, canvas_size[1] * 0.9, 50, 50], // xpos, ypos, xsize, ysize
-  leftBox: [100, 100, 50, 50], // xpos, ypos, xsize, ysize
-  rightBox: [1180, 100, 50, 50], // xpos, ypos, xsize, ysize
+  leftBox: [200, 150, 50, 50], // xpos, ypos, xsize, ysize
+  rightBox: [1080, 150, 50, 50], // xpos, ypos, xsize, ysize
   keepFixation: false, // is fixation cross kept on screen with stimulus
   drawStartBox: [true, true, true], // draw response boxes at trial initiation, fixation cross, and response execution stages
   drawResponseBoxes: [false, true, true], // draw response boxes at trial initiation, fixation cross, and response execution stages
+  drawResponseText: true, // draw response text
   boxLineWidth: 2, // linewidth of the start/target boxes
   requireMousePressStart: true, // is mouse button press inside start box required to initiate trial?
   requireMousePressFinish: false, // is mouse button press inside response box required to end trial?
@@ -56,27 +55,8 @@ const prms = {
 };
 
 ////////////////////////////////////////////////////////////////////////
-//                      Experiment Instructions                       //
+//                     Experiment Utilities                           //
 ////////////////////////////////////////////////////////////////////////
-const task_instructions = {
-  type: 'html-keyboard-response',
-  stimulus:
-    "<H1 style='text-align: left;'>BITTE NUR TEILNEHMEN, FALLS EINE</H1>" +
-    "<H1 style='text-align: left;'>COMPUTER-MAUS ZUR VERFÜGUNG STEHT!</H1><br>" +
-    "<H2 style='text-align: left;'>Liebe/r Teilnehmer/in</H2><br>" +
-    "<H3 style='text-align: left;'>im Experiment werden Sie in jedem Durchgang 3 Quadrate sehen. Zu Beginn</H3>" +
-    "<H3 style='text-align: left;'>des Durchgangs bewegen Sie die Maus in das Quadrat am unteren Bildschirmrand</H3>" +
-    "<H3 style='text-align: left;'>und klicken in das Quadrat. Dann erscheint eine der folgenden Aussagen:</H3><br>" +
-    "<H3 style='text-align: center;'>'jetzt links', 'jetzt rechts', 'nicht links', oder 'nicht rechts'</H3><br>" +
-    "<H3 style='text-align: left;'>Bitte bewegen Sie anschließend die Maus in das entsprechende obere</H3>" +
-    "<H3 style='text-align: left;'>Quadrat, also das LINKE QUADRAT bei 'jetzt links' und 'nicht rechts', und das</H3>" +
-    "<H3 style='text-align: left;'>RECHTE QUADRAT bei 'jetzt rechts' und 'nicht links'. Versuchen Sie</H3>" +
-    "<H3 style='text-align: left;'>dabei möglichst schnell und korrekt zu reagieren. Es gibt im folgenden 16 </H3>" +
-    "<H3 style='text-align: left;'>Übungsdurchgänge Danach beginnt das richtige Experiment.</H3><br>" +
-    "<h3 style='text-align: center;'>Drücke eine beliebige Taste, um fortzufahren!</h3>",
-  post_trial_gap: prms.waitDur,
-};
-
 function drawFeedback() {
   'use strict';
   let ctx = document.getElementById('canvas').getContext('2d');
@@ -91,16 +71,56 @@ function drawFeedback() {
 function codeTrial() {
   'use strict';
   let dat = jsPsych.data.get().last(1).values()[0];
-  let corrCode = 0;
-  if (dat.resp_loc !== dat.end_loc) {
-    corrCode = 1; // choice error
-  }
+  let corrCode = dat.correct_side !== dat.end_loc ? 1 : 0;
   jsPsych.data.addDataToLastTrial({ date: Date(), corrCode: corrCode, blockNum: prms.cBlk, trialNum: prms.cTrl });
   prms.cTrl += 1;
   if (dat.key_press === 27) {
     jsPsych.endExperiment();
   }
 }
+
+////////////////////////////////////////////////////////////////////////
+//                      Experiment Instructions                       //
+////////////////////////////////////////////////////////////////////////
+// TODO: Change instructions
+const task_instructions = {
+  type: 'html-keyboard-response',
+  stimulus:
+    "<H1 style='text-align: left;'>BITTE NUR TEILNEHMEN, FALLS EINE</H1>" +
+    "<H1 style='text-align: left;'>COMPUTER-MAUS ZUR VERFÜGUNG STEHT!</H1><br>" +
+    "<H2 style='text-align: left;'>Liebe/r Teilnehmer/in</H2><br>" +
+    "<H2 style='text-align: left;'>...<br><br>" +
+    "<h3 style='text-align: center;'>Drücke eine beliebige Taste, um fortzufahren!</h3>",
+  post_trial_gap: prms.waitDur,
+};
+
+
+////////////////////////////////////////////////////////////////////////
+//               Stimuli/Timelines                                    //
+////////////////////////////////////////////////////////////////////////
+var stimuli = [];
+for (const s of items) {
+	stimulus = {}
+  // randomly  position targets left or right
+  if (Math.round(Math.random()) == 0){
+    stimulus.right = s['target_rel_text'];
+		stimulus.left = s['target_unrel_text'];
+    stimulus.correct_side = 'right';
+	} else {
+    stimulus.right = s['target_unrel_text'];
+		stimulus.left = s['target_rel_text'];
+    stimulus.correct_side = 'left';
+	}
+  // randomly select probe type 
+  if (Math.round(Math.random()) == 0){
+    stimulus.probe = s['probe_amb']
+    stimulus.probe_type = 'ambiguous'
+  } else {
+    stimulus.probe = s['probe_unamb']
+    stimulus.probe_type = 'unambiguous'
+  }
+	stimuli.push(stimulus);
+};
 
 const trial_stimulus = {
   type: 'mouse-box-response',
@@ -109,7 +129,7 @@ const trial_stimulus = {
   canvas_border: canvas_border,
   fixation_duration: prms.fixDur,
   fixation_position: prms.fixPos,
-  stimulus: jsPsych.timelineVariable('word'),
+  stimulus: jsPsych.timelineVariable('probe'),
   stimulus_position: prms.stimPos,
   stimulus_colour: 'black',
   stimulus_font: prms.stimFont,
@@ -119,28 +139,28 @@ const trial_stimulus = {
   keep_fixation: prms.keepFixation,
   draw_start_box: prms.drawStartBox,
   draw_response_boxes: prms.drawResponseBoxes,
+  draw_response_text: prms.drawResponseText,
   box_linewidth: prms.boxLineWidth,
   require_mouse_press_start: prms.requireMousePressStart,
   require_mouse_press_finish: prms.requireMousePressFinish,
-  word: jsPsych.timelineVariable('word'),
+  word: jsPsych.timelineVariable('probe'),
   scale_factor: null,
   data: {
-    stim_type: 'mouse_negation',
-    word: jsPsych.timelineVariable('word'),
-    resp_loc: jsPsych.timelineVariable('resp_loc'),
+    stim_type: 'cse_mouse_tracking',
+    probe: jsPsych.timelineVariable('probe'),
+    probe_type: jsPsych.timelineVariable('probe_type'),
+    right: jsPsych.timelineVariable('right'),
+    left: jsPsych.timelineVariable('left'),
+    correct_side: jsPsych.timelineVariable('correct_side'),
+  },
+  on_start: function (trial) {
+    trial.left_text = trial.data.left;
+    trial.right_text = trial.data.right;
   },
   on_finish: function () {
     codeTrial();
   },
 };
-
-// prettier-ignore
-const stimuli = [
-  { word: 'jetzt links',  aff_neg: 'aff', resp_loc: 'left' },
-  { word: 'jetzt rechts', aff_neg: 'aff', resp_loc: 'right' },
-  { word: 'nicht rechts', aff_neg: 'neg', resp_loc: 'left' },
-  { word: 'nicht links',  aff_neg: 'neg', resp_loc: 'right' },
-];
 
 const trial_feedback = {
   type: 'static-canvas-keyboard-response',
@@ -156,32 +176,6 @@ const trial_feedback = {
   },
 };
 
-function blockFeedbackTxt(filter_options) {
-  'use strict';
-  let dat = jsPsych.data.get().filter({ ...filter_options, blockNum: prms.cBlk });
-  let nTotal = dat.count();
-  let nError = dat.select('corrCode').values.filter(function (x) {
-    return x !== 0;
-  }).length;
-  dat = jsPsych.data.get().filter({ ...filter_options, blockNum: prms.cBlk, corrCode: 0 });
-  let blockFbTxt =
-    '<H1>Block: ' +
-    prms.cBlk +
-    ' of ' +
-    prms.nBlks +
-    '</H1>' +
-    '<H1>Mean RT: ' +
-    Math.round(dat.select('end_rt').mean()) +
-    ' ms </H1>' +
-    '<H1>Error Rate: ' +
-    Math.round((nError / nTotal) * 100) +
-    ' %</H1>' +
-    '<H2>Drücke eine beliebige Taste, um fortzufahren!</H2>';
-  prms.cBlk += 1;
-  prms.cTrl = 0;
-  return blockFbTxt;
-}
-
 const iti = {
   type: 'static-canvas-keyboard-response',
   canvas_colour: canvas_colour,
@@ -192,25 +186,20 @@ const iti = {
   func: function () {},
 };
 
-const block_feedback = {
-  type: 'html-keyboard-response',
-  stimulus: '',
-  response_ends_trial: true,
-  post_trial_gap: prms.waitDur,
-  on_start: function (trial) {
-    trial.stimulus = blockFeedbackTxt({ stim_type: 'mouse_negation' });
-  },
-};
-
 const trial_timeline = {
-  timeline: [trial_stimulus, trial_feedback, iti],
-  randomize_order: true,
   timeline_variables: stimuli,
+  timeline: [
+    trial_stimulus,
+    trial_feedback,
+    iti
+  ],
+  randomize_order: true,
 };
 
 // For VP Stunden
 const randomString = generateRandomString(16);
 
+// TODO: Change thanks
 const alphaNum = {
   type: 'html-keyboard-response-canvas',
   canvas_colour: canvas_colour,
@@ -271,22 +260,18 @@ function genExpSeq() {
 
   let exp = [];
 
+  // pre-load images
+  // Should we pro-load the images?
+  // exp.push(images.healthy);
+  // exp.push(images.unhealthy);
+
   exp.push(fullscreen_on);
   exp.push(check_screen);
   exp.push(welcome_de);
   exp.push(resize_de);
-  // exp.push(vpInfoForm_de);
+  exp.push(vpInfoForm_de);
   exp.push(task_instructions);
-
-  for (let blk = 0; blk < prms.nBlks; blk += 1) {
-    let blk_timeline = { ...trial_timeline };
-    blk_timeline.sample = {
-      type: 'fixed-repetitions',
-      size: blk === 0 ? prms.nTrlsP / 4 : prms.nTrlsE / 4,
-    };
-    exp.push(blk_timeline); // trials within a block
-    exp.push(block_feedback); // show previous block performance
-  }
+  exp.push(trial_timeline); // trials within a block
 
   // save data
   exp.push(save_data);
