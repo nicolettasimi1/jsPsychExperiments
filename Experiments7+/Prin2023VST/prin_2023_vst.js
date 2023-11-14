@@ -18,6 +18,7 @@ const PRMS = {
     iti: 1000,
     stimFont: '50px arial',
     stimSize: 50,
+    pavlovia: false,
 };
 
 
@@ -164,6 +165,15 @@ function genExpSeq() {
 
     let exp = [];
 
+    if (PRMS.pavlovia) {
+        /* init connection with pavlovia.org */
+        var pavlovia_init = {
+            type: "pavlovia",
+            command: "init"
+        };
+        exp.push(pavlovia_init);
+    }
+
     exp.push(fullscreen(true));
     exp.push(browser_check(PRMS.screenRes));
     exp.push(resize_browser("en"));
@@ -192,6 +202,15 @@ function genExpSeq() {
     // debrief
     exp.push(END_MESSAGE);
     exp.push(fullscreen(false));
+
+    if (PRMS.pavlovia) {
+        /* finish connection with pavlovia.org */
+        var pavlovia_finish = {
+            type: "pavlovia",
+            command: "finish"
+        };
+        exp.push(pavlovia_finish);
+    }
 
     return exp;
 }
